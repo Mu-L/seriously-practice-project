@@ -10,5 +10,6 @@ character_name = "Slime"
 attack = 2
 defense = 1
 abilities = Array[ExtResource("1_u4ky3")]([ExtResource("2_h007o")])
+miss_chance = 0.085
 currency_reward = 10
 metadata/_custom_type_script = "uid://coyu443478sd4"

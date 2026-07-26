@@ -1,3 +1,4 @@
+# character_stats.gd
 extends Resource
 class_name CharacterStats
 
@@ -15,6 +16,9 @@ var current_mp: int
 
 @export_group("Abilities")
 @export var abilities: Array[Ability] = []
+
+@export_group("Accuracy")
+@export_range(0.0, 1.0, 0.001) var miss_chance: float = 0.0
 
 @export_group("Leveling")
 @export var level: int = 1

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cl2h5p6f08x6c"
-path="res://.godot/imported/cliffs_and_water.png-675b55caa830904fc395af476acec61e.ctex"
+uid="uid://cimvwm0d6fpnx"
+path="res://.godot/imported/dungeon.png-4c43558ecf47531d207a1c5c3f99a187.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tilesets/cliffs_and_water.png"
-dest_files=["res://.godot/imported/cliffs_and_water.png-675b55caa830904fc395af476acec61e.ctex"]
+source_file="res://tilesets/dungeon.png"
+dest_files=["res://.godot/imported/dungeon.png-4c43558ecf47531d207a1c5c3f99a187.ctex"]
 
 [params]
 

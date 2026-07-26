@@ -89,9 +89,13 @@ func _on_player_choice() -> void:
 	print("Waiting for ", active_player.stats.character_name, " to choose an action...")
 
 func _on_target_chosen(target: Battler) -> void:
-	var damage_amount: int = int(active_player.stats.attack * active_player.get_attack_modifier())
-	target.take_damage(damage_amount)
-	_log(active_player.stats.character_name + " attacks " + target.stats.character_name + " for " + str(damage_amount) + " damage!")
+	# Roll for physical attack miss
+	if randf() < active_player.stats.miss_chance:
+		_log(active_player.stats.character_name + "'s attack missed!")
+	else:
+		var damage_amount: int = int(active_player.stats.attack * active_player.get_attack_modifier())
+		target.take_damage(damage_amount)
+		_log(active_player.stats.character_name + " attacks " + target.stats.character_name + " for " + str(damage_amount) + " damage!")
 
 	var enemies: Array = get_tree().get_nodes_in_group("enemies")
 	var all_enemies_defeated: bool = enemies.all(func(enemy): return enemy.stats.current_health <= 0)
@@ -208,14 +212,14 @@ func _on_enemy_action() -> void:
 		# State machine to decide current enemy action
 		var action_taken: bool = false
 		
-		# 1. Low health defend check
+		# 1. Check health threshold (< 33%) -> 50% chance to defend instead of attacking
 		var hp_pct: float = float(enemy.stats.current_health) / float(enemy.stats.max_health) if enemy.stats.max_health > 0 else 0.0
 		if hp_pct < 0.33 and randf() < 0.50:
 			enemy.is_defending = true
 			_log(enemy.stats.character_name + " defends!")
 			action_taken = true
 			
-		# 2. 10% Chance to cast a random assigned ability
+		# 2. If not defending, roll a 10% chance to cast a random assigned ability
 		if not action_taken and enemy.stats.abilities.size() > 0 and randf() < 0.10:
 			var ability: Ability = enemy.stats.abilities.pick_random()
 			if enemy.stats.current_mp >= ability.mp_cost:
@@ -241,12 +245,15 @@ func _on_enemy_action() -> void:
 						
 				action_taken = true
 				
-		# 3. Regular attack fallback
+		# 3. Fallback to default physical attack (incorporating miss_chance checks)
 		if not action_taken:
 			var target: Battler = living_party.pick_random()
-			var damage_amount: int = int(enemy.stats.attack * enemy.get_attack_modifier())
-			target.take_damage(damage_amount)
-			_log(enemy.stats.character_name + " attacks " + target.stats.character_name + " for " + str(damage_amount) + " damage!")
+			if randf() < enemy.stats.miss_chance:
+				_log(enemy.stats.character_name + "'s attack missed!")
+			else:
+				var damage_amount: int = int(enemy.stats.attack * enemy.get_attack_modifier())
+				target.take_damage(damage_amount)
+				_log(enemy.stats.character_name + " attacks " + target.stats.character_name + " for " + str(damage_amount) + " damage!")
 
 	change_state(State.CHECK_END)
 
