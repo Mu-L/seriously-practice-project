@@ -42,13 +42,29 @@ func register_enemy_defeated(enemy_name: String) -> void:
 				_complete_quest(quest_id)
 
 func place_player_at_spawn(scene_root: Node) -> void:
+	# Deprecated helper redirected to the unified initializer
 	initialize_player_position(scene_root)
 
 func initialize_player_position(scene_root: Node) -> void:
 	var player := scene_root.get_tree().get_first_node_in_group("player")
 	if player == null:
+		print_rich("[color=red]=== Player Initialization Error ===[/color]")
+		print("Player node was not found in the 'player' group!")
 		return
 
+	# Diagnostics: Check if the level has the custom speed variable registered in memory
+	print_rich("[color=yellow]=== Player Sizing & Speed Diagnostics ===[/color]")
+	print("Active level root node: '", scene_root.name, "'")
+	
+	if "player_speed" in scene_root:
+		print("Found 'player_speed' property! Overwriting speed from default (", player.speed, ") to: ", scene_root.player_speed)
+		player.speed = scene_root.player_speed
+	else:
+		print_rich("[color=orange]Warning: 'player_speed' property was NOT detected on '", scene_root.name, "' script! Fallback to default (", player.speed, ") used instead.[/color]")
+		print("Double-check that the script on your root scene node has 'player_speed' exported.")
+	print_rich("[color=yellow]-----------------------------------------[/color]")
+
+	# 1. If we transitioned maps, use the target spawn point
 	if not pending_spawn_point.is_empty():
 		for marker in scene_root.get_tree().get_nodes_in_group("spawn_points"):
 			if marker.spawn_id == pending_spawn_point:
@@ -56,6 +72,8 @@ func initialize_player_position(scene_root: Node) -> void:
 				pending_spawn_point = ""
 				return
 		push_warning("No spawn point found matching: " + pending_spawn_point)
+
+	# 2. Otherwise, if we loaded a save file, restore the saved overworld coordinates
 	elif player_overworld_position != Vector2.ZERO:
 		player.global_position = player_overworld_position
 
@@ -96,6 +114,7 @@ func has_save(slot: String) -> bool:
 func save_game(slot: String) -> void:
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
 
+	# Update live overworld coordinates if we are currently in an overworld or town map
 	var player = get_tree().get_first_node_in_group("player")
 	if player != null:
 		player_overworld_position = player.global_position

@@ -6,4 +6,6 @@
 [resource]
 script = ExtResource("1_w42me")
 character_name = "Hero2"
+max_health = 18
+attack = 4
 metadata/_custom_type_script = "uid://coyu443478sd4"

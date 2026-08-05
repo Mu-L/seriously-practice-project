@@ -6,4 +6,7 @@
 [resource]
 script = ExtResource("1_dkhtw")
 character_name = "Hero3"
+max_health = 15
+attack = 2
+max_mp = 20
 metadata/_custom_type_script = "uid://coyu443478sd4"

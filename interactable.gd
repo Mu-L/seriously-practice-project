@@ -15,7 +15,10 @@ enum NPCClass {
 	PERSON,
 	BOY,
 	GIRL,
-	CHILD
+	CHILD,
+	SONYA,
+	LEON,
+	SELAH
 }
 
 enum MovementPattern {
@@ -38,7 +41,10 @@ const CLASS_FILE_NAMES: Dictionary = {
 	NPCClass.PERSON: "person",
 	NPCClass.BOY: "boy",
 	NPCClass.GIRL: "girl",
-	NPCClass.CHILD: "child"
+	NPCClass.CHILD: "child",
+	NPCClass.SONYA: "sonya",
+	NPCClass.LEON: "leon",
+	NPCClass.SELAH: "selah"
 }
 
 @export_group("Visuals")
@@ -295,11 +301,13 @@ func _determine_next_move() -> void:
 			var directions = [Vector2.RIGHT, Vector2.LEFT, Vector2.DOWN, Vector2.UP]
 			var dir = directions.pick_random()
 			
+			# Choose a step distance in grid multiples
 			var steps = [16.0, 32.0, 48.0]
 			var dist = steps.pick_random()
 			
 			var potential_target = global_position + dir * dist
 			
+			# Keep the wandering restricted within the designated pace range circle
 			if potential_target.distance_to(_start_position) <= pace_range:
 				if _can_move_to(dir, dist):
 					_target_position = potential_target
@@ -314,7 +322,7 @@ func _determine_next_move() -> void:
 func get_speaker_name() -> String:
 	if not speaker_name.is_empty():
 		return speaker_name
-	# Automatically convert internal enum representation to styled casing (e.g. "MAYOR_MAN" -> "Mayor Man")
+	# Automatically convert internal enum representation to styled casing
 	return NPCClass.keys()[npc_class].capitalize()
 
 func interact_as_quest_giver() -> Array[String]:

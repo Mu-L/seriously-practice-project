@@ -5,6 +5,9 @@
 
 [resource]
 script = ExtResource("1_qbrrh")
-character_name = "Hero4"
+character_name = "Selah"
+max_health = 15
+attack = 4
+defense = 3
 max_mp_growth = 3
 metadata/_custom_type_script = "uid://coyu443478sd4"
