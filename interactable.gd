@@ -18,7 +18,8 @@ enum NPCClass {
 	CHILD,
 	SONYA,
 	LEON,
-	SELAH
+	SELAH,
+	CHEST
 }
 
 enum MovementPattern {
@@ -44,7 +45,8 @@ const CLASS_FILE_NAMES: Dictionary = {
 	NPCClass.CHILD: "child",
 	NPCClass.SONYA: "sonya",
 	NPCClass.LEON: "leon",
-	NPCClass.SELAH: "selah"
+	NPCClass.SELAH: "selah",
+	NPCClass.CHEST: "chest"
 }
 
 @export_group("Visuals")
@@ -53,8 +55,14 @@ const CLASS_FILE_NAMES: Dictionary = {
 		npc_class = value
 		if is_node_ready():
 			_update_npc_sprite()
+			# Intelligently default nameplate visibility based on selection
+			if npc_class == NPCClass.CHEST:
+				show_speaker_name = false
+			else:
+				show_speaker_name = true
 
 @export_group("Interaction")
+@export var show_speaker_name: bool = true
 @export var speaker_name: String = ""
 @export var interactable_id: String = ""
 @export var dialogue_lines: Array[String] = []
@@ -64,6 +72,11 @@ const CLASS_FILE_NAMES: Dictionary = {
 @export var shop_inventory: Array[Item] = []
 @export var is_quest_giver: bool = false
 @export var quest: Quest
+
+@export_group("Direct Item Reward")
+@export var gives_item: bool = false
+@export var reward_item: Item = null
+@export var reward_item_quantity: int = 1
 
 @export_group("Movement Patterns")
 @export var movement_pattern: MovementPattern = MovementPattern.STATIONARY
@@ -320,6 +333,8 @@ func _determine_next_move() -> void:
 			_wait_timer = wait_time
 
 func get_speaker_name() -> String:
+	if not show_speaker_name:
+		return ""
 	if not speaker_name.is_empty():
 		return speaker_name
 	# Automatically convert internal enum representation to styled casing
@@ -344,7 +359,16 @@ func interact_as_quest_giver() -> Array[String]:
 func get_dialogue_to_show() -> Array[String]:
 	if one_time_only and GameManager.has_talked_to(interactable_id):
 		return repeat_lines
-	return dialogue_lines
+		
+	var lines = dialogue_lines.duplicate()
+	
+	# If direct reward is enabled, grant it on first interaction
+	if gives_item and reward_item != null:
+		GameManager.add_item(reward_item, reward_item_quantity)
+		# Append automatic feedback (e.g. "Found Potion (x1)!")
+		lines.append("Found %s (x%d)!" % [reward_item.item_name, reward_item_quantity])
+		
+	return lines
 
 func mark_as_talked_to() -> void:
 	if one_time_only:
